@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | OlympusPay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2234;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 10% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .navbar {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-primary) !important;
+        }
+
+        .navbar-brand i { color: #fbbf24; }
+
+        .quick-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-link {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .main-content { padding: 30px 0; }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h1 i { color: var(--warning); }
+
+        .alert-custom {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .section-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header .badge-count {
+            background: var(--warning);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .section-body { padding: 0; }
+        .section-body.padded { padding: 24px; }
+
+        .table-custom {
+            width: 100%;
+            margin: 0;
+        }
+
+        .table-custom th {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border: none;
+        }
+
+        .table-custom td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info .name { font-weight: 600; }
+        .user-info .id { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .withdraw-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .withdraw-info .amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--danger);
+        }
+
+        .withdraw-info .pix {
+            font-size: 0.8rem;
+            color: var(--info);
+            margin-top: 4px;
+        }
+
+        .withdraw-info .ref {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-check-status {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--info);
+        }
+
+        .btn-check-status:hover {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-api {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .btn-api:hover {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-manual {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .btn-manual:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-reject:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-control-dark {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .form-control-dark:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .user-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-row:last-child { border-bottom: none; }
+
+        .user-row:hover { background: rgba(99, 102, 241, 0.05); }
+
+        .user-row .info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 0;
+        }
+
+        .user-row .avatar {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-row .details { min-width: 0; }
+        .user-row .details .name { font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .user-row .details .email { font-size: 0.8rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; }
+
+        .user-row .balance {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 1.1rem;
+            white-space: nowrap;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .user-row .actions { display: flex; gap: 10px; align-items: center; min-width: 100px; justify-content: flex-end; }
+
+        .btn-ban {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ban.banned {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .btn-ban.active {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-ban:hover {
+            transform: scale(1.05);
+        }
+
+        .badge-admin {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-banned {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.4rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .user-row { grid-template-columns: 1fr; gap: 15px; text-align: center; }
+            .user-row .info { flex-direction: column; }
+            .user-row .balance { text-align: center; }
+            .user-row .actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-landmark me-2"></i>OlympusPay
+            </a>
+            <div class="quick-links">
+                <a href="/dashboard" class="quick-link"><i class="fas fa-home me-1"></i>Dashboard</a>
+                <a href="/dashboard-admin" class="quick-link"><i class="fas fa-chart-line me-1"></i>Estatísticas</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-user-shield"></i>Painel Administrativo</h1>
+            </div>
+
+            <% if(msg) { %>
+                <div class="alert-custom">
+                    <i class="fas fa-info-circle me-2"></i><%= msg %>
+                </div>
+            <% } %>
+
+            <% const pendingWithdraws = transactions.filter(t => t.type === 'withdraw' && t.status === 'pending'); %>
+            
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-exclamation-triangle text-warning"></i>Saques Pendentes</h3>
+                    <span class="badge-count"><%= pendingWithdraws.length %></span>
+                </div>
+                <div class="section-body">
+                    <% if(pendingWithdraws.length > 0) { %>
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Valor / Chave PIX</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% pendingWithdraws.forEach(tx => { %>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <span class="name"><%= tx.userName %></span>
+                                            <span class="id">ID: <%= tx.uid %></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="withdraw-info">
+                                            <span class="amount">R$ <%= parseFloat(tx.val).toFixed(2) %></span>
+                                            <span class="pix"><%= tx.key_type %>: <%= tx.pix_key %></span>
+                                            <span class="ref">Ref: <%= tx.id %></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <form action="/admin/withdraw-action" method="POST">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <input type="hidden" name="txId" value="<%= tx.id %>">
+                                            <div class="action-buttons">
+                                                <button type="submit" formaction="/admin/check-withdraw-status" class="btn-action btn-check-status">
+                                                    <i class="fas fa-search"></i>Check
+                                                </button>
+                                                <button type="submit" name="action" value="approve_api" class="btn-action btn-api">
+                                                    <i class="fas fa-robot"></i>API
+                                                </button>
+                                                <button type="submit" name="action" value="approve_manual" class="btn-action btn-manual">
+                                                    <i class="fas fa-check"></i>Manual
+                                                </button>
+                                                <button type="submit" name="action" value="reject" class="btn-action btn-reject">
+                                                    <i class="fas fa-times"></i>Rejeitar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <p>Nenhum saque pendente no momento</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-cog text-primary"></i>Configurar Taxas</h3>
+                </div>
+                <div class="section-body padded">
+                    <form action="/admin/settings" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-arrow-down me-2"></i>Taxa de Depósito (R$)</label>
+                                <input type="number" step="0.01" name="fee_dep" class="form-control-dark" value="<%= settings.fee_dep %>">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-arrow-up me-2"></i>Taxa de Saque (R$)</label>
+                                <input type="number" step="0.01" name="fee_sac" class="form-control-dark" value="<%= settings.fee_sac %>">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="fas fa-save me-2"></i>Salvar Taxas
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h3><i class="fas fa-users text-info"></i>Usuários Cadastrados</h3>
+                    <span class="badge-count"><%= users.length %></span>
+                </div>
+                <div class="section-body">
+                    <% users.forEach(u => { %>
+                    <div class="user-row">
+                        <div class="info">
+                            <div class="avatar"><%= u.name.charAt(0).toUpperCase() %></div>
+                            <div class="details">
+                                <div class="name">
+                                    <%= u.name %>
+                                    <% if(u.isAdmin) { %><span class="badge-admin ms-2">ADMIN</span><% } %>
+                                    <% if(u.banned) { %><span class="badge-banned ms-2">BANIDO</span><% } %>
+                                </div>
+                                <div class="email"><%= u.email %></div>
+                            </div>
+                        </div>
+                        <div class="balance">R$ <%= parseFloat(u.balance).toFixed(2) %></div>
+                        <div class="actions">
+                            <form action="/admin/ban" method="POST" style="margin:0;">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="userId" value="<%= u.id %>">
+                                <button type="submit" class="btn-ban <%= u.banned ? 'banned' : 'active' %>">
+                                    <i class="fas fa-<%= u.banned ? 'unlock' : 'ban' %> me-1"></i>
+                                    <%= u.banned ? 'Desbanir' : 'Banir' %>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Criar Conta | OlympusPay</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glow-primary: rgba(99, 102, 241, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .navbar {
+            background: transparent;
+            padding: 20px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            color: #fbbf24;
+            font-size: 1.3rem;
+        }
+
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 8px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .register-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .security-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-header-section h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .card-header-section p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fca5a5;
+            font-size: 0.85rem;
+        }
+
+        .alert-error i {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group label .counter {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        .form-group label .counter.valid {
+            color: var(--success);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            transition: color 0.2s;
+            z-index: 1;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px 14px 48px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow-primary);
+            background: rgba(10, 15, 26, 0.8);
+        }
+
+        .input-wrapper input:focus ~ i,
+        .input-wrapper:focus-within i {
+            color: var(--primary-light);
+        }
+
+        .input-wrapper.valid input {
+            border-color: var(--success);
+        }
+
+        .input-wrapper.valid i {
+            color: var(--success);
+        }
+
+        .captcha-container {
+            display: flex;
+            justify-content: center;
+            margin: 24px 0;
+            min-height: 78px;
+        }
+
+        .g-recaptcha {
+            transform-origin: center;
+        }
+
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .terms-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-dark);
+            cursor: pointer;
+            accent-color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .terms-check label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .terms-check label a {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .terms-check label a:hover {
+            color: var(--primary-light);
+        }
+
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 24px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-register:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px var(--glow-primary);
+        }
+
+        .btn-register:not(:disabled):hover::before {
+            left: 100%;
+        }
+
+        .btn-register:disabled {
+            background: #374151;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-register:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            gap: 16px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .login-link a {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .login-link a:hover {
+            color: var(--primary-light);
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 32px 24px;
+            }
+
+            .g-recaptcha {
+                transform: scale(0.9);
+            }
+
+            .captcha-container {
+                min-height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-landmark"></i>
+                OlympusPay
+            </a>
+            <a href="/login" class="btn-login-nav">
+                <i class="fas fa-sign-in-alt me-2"></i>Entrar
+            </a>
+        </div>
+    </nav>
+
+    <div class="register-wrapper">
+        <div class="register-card">
+            
+            <div class="card-header-section">
+                <div class="security-pill">
+                    <i class="fas fa-shield-alt"></i>
+                    Dados Criptografados
+                </div>
+                <h2>Crie sua conta</h2>
+                <p>Preencha os dados abaixo para começar</p>
+            </div>
+
+            <% if(typeof error !== 'undefined' && error) { %>
+                <div class="alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span><%= error %></span>
+                </div>
+            <% } %>
+
+            <form action="/register" method="POST" id="registerForm">
+                
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" placeholder="Escolha seu usuário" required>
+                        <i class="far fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        CPF
+                        <span class="counter" id="cpfCounter">0/11</span>
+                    </label>
+                    <div class="input-wrapper" id="cpfWrapper">
+                        <input type="tel" 
+                               name="cpf" 
+                               id="cpfInput" 
+                               placeholder="Apenas números" 
+                               maxlength="11" 
+                               inputmode="numeric" 
+                               autocomplete="off"
+                               required>
+                        <i class="far fa-id-card"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" placeholder="seu@email.com" required>
+                        <i class="far fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" placeholder="Crie uma senha forte" required>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+
+                <div class="captcha-container">
+                    <div class="g-recaptcha" 
+                         data-sitekey="6LfhIDIsAAAAADJAOwxnLL32kwbNwNFrAHS8x_Md" 
+                         data-theme="dark"
+                         data-callback="captchaSolved"
+                         data-expired-callback="captchaExpired">
+                    </div>
+                </div>
+
+                <div class="terms-check">
+                    <input type="checkbox" id="termsCheck" required>
+                    <label for="termsCheck">
+                        Concordo com os <a href="/terms" target="_blank">Termos de Uso</a> e Política de Privacidade da OlympusPay.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-register" id="submitBtn" disabled>
+                    <i class="fas fa-user-plus"></i>
+                    Criar Conta
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>ou</span>
+            </div>
+
+            <p class="login-link">
+                Já tem uma conta? <a href="/login">Fazer login</a>
+            </p>
+
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const cpfInput = document.getElementById('cpfInput');
+        const cpfCounter = document.getElementById('cpfCounter');
+        const cpfWrapper = document.getElementById('cpfWrapper');
+
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            e.target.value = value;
+            cpfCounter.innerText = `${value.length}/11`;
+
+            if (value.length === 11) {
+                cpfWrapper.classList.add('valid');
+                cpfCounter.classList.add('valid');
+            } else {
+                cpfWrapper.classList.remove('valid');
+                cpfCounter.classList.remove('valid');
+            }
+            checkSubmit();
+        });
+
+        let isRecaptchaChecked = false;
+
+        function captchaSolved() { isRecaptchaChecked = true; checkSubmit(); }
+        function captchaExpired() { isRecaptchaChecked = false; checkSubmit(); }
+
+        function checkSubmit() {
+            const terms = document.getElementById('termsCheck').checked;
+            const btn = document.getElementById('submitBtn');
+            const cpfVal = cpfInput.value;
+            
+            if (terms && isRecaptchaChecked && cpfVal.length === 11) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        document.getElementById('termsCheck').addEventListener('change', checkSubmit);
+    </script>
+</body>
+</html>

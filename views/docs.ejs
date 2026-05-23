@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Docs | OlympusPay</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/tokyo-night-dark.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #a855f7;
+            --bg-dark: #020617;
+            --sidebar-bg: #0f172a;
+            --text-color: #cbd5e1;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- SIDEBAR (PC) --- */
+        .sidebar {
+            height: 100vh;
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            color: #94a3b8;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-link i { width: 25px; }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
+        .main-content {
+            margin-left: 280px;
+            padding: 3rem;
+            max-width: 1000px;
+        }
+
+        /* --- BLOCOS DE CÓDIGO --- */
+        pre {
+            background: #1e1e1e;
+            border-radius: 12px;
+            position: relative;
+            margin-top: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #ccc;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:hover { background: var(--primary); color: white; }
+
+        /* --- BADGES E TABELAS --- */
+        .method {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .get { background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .post { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+
+        .endpoint-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .param-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .param-table th { text-align: left; color: #fff; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .param-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.9rem; }
+        .required { color: #f87171; font-size: 0.75rem; border: 1px solid rgba(248, 113, 113, 0.3); padding: 2px 6px; border-radius: 4px; }
+        .optional { color: #94a3b8; font-size: 0.75rem; border: 1px solid rgba(148, 163, 184, 0.3); padding: 2px 6px; border-radius: 4px; }
+
+        /* --- RESPONSIVIDADE (CELULAR) --- */
+        .mobile-header { display: none; }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+                margin-top: 60px;
+            }
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: fixed;
+                top: 0; left: 0; right: 0;
+                height: 70px;
+                background: var(--sidebar-bg);
+                padding: 0 20px;
+                z-index: 1001;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-header">
+        <div class="fw-bold text-white fs-4"><i class="fas fa-landmark text-warning"></i> Docs</div>
+        <button class="btn btn-outline-light border-0" onclick="toggleSidebar()">
+            <i class="fas fa-bars fs-4"></i>
+        </button>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-landmark text-warning"></i> Olympus<span class="text-primary">Pay</span>
+        </div>
+        
+        <small class="text-uppercase text-muted fw-bold ms-3" style="font-size: 0.7rem; letter-spacing: 1px;">Geral</small>
+        <nav class="nav flex-column mt-2 mb-4">
+            <a class="nav-link active" href="#intro"><i class="fas fa-home me-2"></i> Introdução</a>
+            <a class="nav-link" href="#auth"><i class="fas fa-key me-2"></i> Autenticação</a>
+        </nav>
+
+        <small class="text-uppercase text-muted fw-bold ms-3" style="font-size: 0.7rem; letter-spacing: 1px;">Endpoints</small>
+        <nav class="nav flex-column mt-2">
+            <a class="nav-link" href="#balance"><i class="fas fa-wallet me-2"></i> Consultar Saldo</a>
+            <a class="nav-link" href="#pay"><i class="fas fa-arrow-down me-2"></i> Criar Pagamento</a>
+            <a class="nav-link" href="#withdraw"><i class="fas fa-arrow-up me-2"></i> Realizar Saque</a>
+            <a class="nav-link text-warning" href="#check-pay"><i class="fas fa-search-dollar me-2"></i> Check Pagamento</a>
+            <a class="nav-link text-warning" href="#check-wd"><i class="fas fa-search me-2"></i> Check Saque</a>
+        </nav>
+
+        <small class="text-uppercase text-muted fw-bold ms-3" style="font-size: 0.7rem; letter-spacing: 1px;">Exemplos</small>
+        <nav class="nav flex-column mt-2">
+            <a class="nav-link text-info" href="#python-example"><i class="fab fa-python me-2"></i> Exemplo Python</a>
+        </nav>
+
+        <div class="mt-5 pt-3 border-top border-secondary">
+            <a href="/dashboard" class="btn btn-primary w-100 fw-bold"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a href="/developer" class="btn btn-outline-light w-100 mt-2 btn-sm">Minhas Chaves</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <section id="intro" class="mb-5">
+            <h1 class="display-5 fw-bold text-white mb-3">Documentação da API</h1>
+            <p class="lead text-secondary">Integre o sistema OlympusPay ao seu site, bot ou aplicativo de forma simples e rápida.</p>
+            
+            <div class="alert alert-dark border border-secondary d-inline-block mt-3 text-white">
+                <i class="fas fa-globe me-2 text-primary"></i> Base URL: <code class="text-warning ms-2">https://olympuspay.squareweb.app/api/v1</code>
+            </div>
+        </section>
+
+        <section id="auth" class="endpoint-card">
+            <h3 class="text-white mb-3"><i class="fas fa-lock text-primary me-2"></i> Autenticação</h3>
+            <p>Todas as requisições devem incluir sua <strong>API Key</strong> no cabeçalho (Header).</p>
+            
+            <pre><code class="language-bash">Authorization: oly_live_seutokenaqui123...</code></pre>
+            
+            <div class="alert alert-warning mt-3 mb-0 border-0" style="background: rgba(250, 204, 21, 0.1); color: #fde047;">
+                <i class="fas fa-exclamation-triangle me-2"></i> Nunca compartilhe sua chave API com ninguém. Se vazar, gere uma nova no painel.
+            </div>
+        </section>
+
+        <section id="balance" class="endpoint-card">
+            <div class="d-flex align-items-center mb-3">
+                <span class="method get">GET</span>
+                <code class="text-white fs-5">/balance</code>
+            </div>
+            <h3 class="text-white">Consultar Saldo</h3>
+            <p>Retorna o saldo atual disponível na sua conta.</p>
+
+            <h5 class="text-white mt-4">Exemplo de Requisição</h5>
+            <pre><code class="language-bash">curl -X GET https://olympuspay.squareweb.app/api/v1/balance \
+  -H "Authorization: oly_live_..."</code></pre>
+
+            <h5 class="text-white mt-3">Resposta (200 OK)</h5>
+            <pre><code class="language-json">{
+  "balance": 150.50
+}</code></pre>
+        </section>
+
+        <section id="pay" class="endpoint-card">
+            <div class="d-flex align-items-center mb-3">
+                <span class="method post">POST</span>
+                <code class="text-white fs-5">/pay</code>
+            </div>
+            <h3 class="text-white">Criar Pagamento (Depósito)</h3>
+            <p>Gera um PIX Copia e Cola para seu cliente pagar. O ID retornado aqui é o <strong>ID do Banco</strong>.</p>
+
+            <h5 class="text-white mt-4">Parâmetros (Body JSON)</h5>
+            <table class="param-table">
+                <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><code>amount</code> <span class="required">Obrigatório</span></td>
+                        <td>Number</td>
+                        <td>Valor do pagamento (Ex: 10.00). Mínimo 5.00.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5 class="text-white mt-4">Exemplo de Body</h5>
+            <pre><code class="language-json">{
+  "amount": 25.00
+}</code></pre>
+
+            <h5 class="text-white mt-3">Resposta de Sucesso</h5>
+            <pre><code class="language-json">{
+  "id": 49281,  // <-- ID NUMÉRICO (Use este para checar status)
+  "status": "pending",
+  "qr_code": "00020126580014br.gov.bcb.pix...",
+  "qr_code_base64": "https://api.qrserver.com/..."
+}</code></pre>
+        </section>
+
+        <section id="withdraw" class="endpoint-card">
+            <div class="d-flex align-items-center mb-3">
+                <span class="method post">POST</span>
+                <code class="text-white fs-5">/withdraw</code>
+            </div>
+            <h3 class="text-white">Realizar Saque</h3>
+            <p>Envia dinheiro da sua conta para uma chave PIX externa. O ID retornado é o <strong>ID Olympus</strong>.</p>
+
+            <h5 class="text-white mt-4">Parâmetros (Body JSON)</h5>
+            <table class="param-table">
+                <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><code>amount</code> <span class="required">Obrigatório</span></td>
+                        <td>Number</td>
+                        <td>Valor a ser enviado (Ex: 50.00).</td>
+                    </tr>
+                    <tr>
+                        <td><code>pix_key</code> <span class="required">Obrigatório</span></td>
+                        <td>String</td>
+                        <td>A chave Pix do destinatário.</td>
+                    </tr>
+                    <tr>
+                        <td><code>key_type</code> <span class="optional">Opcional</span></td>
+                        <td>String</td>
+                        <td>Tipo da chave: <code>cpf</code>, <code>email</code>, <code>phone</code>, <code>random</code>. Se não enviar, tentamos detectar.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5 class="text-white mt-4">Exemplo de Body</h5>
+            <pre><code class="language-json">{
+  "amount": 50.00,
+  "pix_key": "cliente@email.com",
+  "key_type": "email"
+}</code></pre>
+
+            <h5 class="text-white mt-3">Resposta de Sucesso</h5>
+            <pre><code class="language-json">{
+  "id": "wd_api_1709230021",  // <-- ID OLYMPUS (Use este para checar status)
+  "status": "pending",
+  "message": "Saque solicitado."
+}</code></pre>
+        </section>
+
+        <section id="check-pay" class="endpoint-card border border-warning">
+            <div class="d-flex align-items-center mb-3">
+                <span class="method get">GET</span>
+                <code class="text-white fs-5">/payment/:id</code>
+            </div>
+            <h3 class="text-white">Consultar Pagamento <span class="badge bg-warning text-dark ms-2" style="font-size: 0.7rem;">AUTO-APPROVE</span></h3>
+            <p>Use o <strong>ID Numérico</strong> recebido na criação do depósito.</p>
+            <p class="text-secondary small"><i class="fas fa-info-circle text-warning"></i> Se o status na API bancária for <strong>PAID</strong>, essa rota atualiza seu saldo automaticamente.</p>
+
+            <h5 class="text-white mt-4">Exemplo de Requisição</h5>
+            <pre><code class="language-bash">curl -X GET https://olympuspay.squareweb.app/api/v1/payment/49281 \
+  -H "Authorization: oly_live_..."</code></pre>
+
+            <h5 class="text-white mt-3">Respostas Possíveis</h5>
+            
+            <strong class="text-success"><i class="fas fa-check-circle"></i> Caso 1: Sucesso (Pago e Creditado)</strong>
+            <pre><code class="language-json">{
+  "id": 49281,
+  "status": "paid",
+  "message": "Pagamento confirmado e saldo creditado.",
+  "received": 24.00 
+}</code></pre>
+
+            <strong class="text-warning mt-3 d-block"><i class="fas fa-clock"></i> Caso 2: Pendente (Aguardando)</strong>
+            <pre><code class="language-json">{
+  "id": 49281,
+  "status": "pending",
+  "vision_status": "pending"
+}</code></pre>
+        </section>
+
+        <section id="check-wd" class="endpoint-card border border-danger">
+            <div class="d-flex align-items-center mb-3">
+                <span class="method get">GET</span>
+                <code class="text-white fs-5">/withdraw/:id</code>
+            </div>
+            <h3 class="text-white">Consultar Saque <span class="badge bg-danger ms-2" style="font-size: 0.7rem;">AUTO-REFUND</span></h3>
+            <p>Use o <strong>ID Olympus (wd_api_...)</strong> recebido na solicitação de saque.</p>
+            <p class="text-secondary small"><i class="fas fa-undo text-danger"></i> Se o saque falhar no banco (chave inválida, rejeitado), essa rota <strong>devolve seu dinheiro</strong> automaticamente.</p>
+
+            <h5 class="text-white mt-4">Exemplo de Requisição</h5>
+            <pre><code class="language-bash">curl -X GET https://olympuspay.squareweb.app/api/v1/withdraw/wd_api_170923... \
+  -H "Authorization: oly_live_..."</code></pre>
+
+            <h5 class="text-white mt-3">Respostas Possíveis</h5>
+
+            <strong class="text-success"><i class="fas fa-check-circle"></i> Caso 1: Sucesso (Enviado)</strong>
+            <pre><code class="language-json">{
+  "id": "wd_api_170923...",
+  "status": "paid"
+}</code></pre>
+
+            <strong class="text-warning mt-3 d-block"><i class="fas fa-clock"></i> Caso 2: Pendente (Processando)</strong>
+            <pre><code class="language-json">{
+  "id": "wd_api_170923...",
+  "status": "pending"
+}</code></pre>
+
+            <strong class="text-danger mt-3 d-block"><i class="fas fa-times-circle"></i> Caso 3: Falha (Dinheiro Estornado)</strong>
+            <pre><code class="language-json">{
+  "id": "wd_api_170923...",
+  "status": "failed",
+  "message": "Falha no banco. Valor estornado."
+}</code></pre>
+        </section>
+
+        <section id="python-example" class="endpoint-card border border-primary">
+            <div class="d-flex align-items-center mb-3">
+                <i class="fab fa-python text-warning fs-1 me-3"></i>
+                <div>
+                    <h3 class="text-white mb-0">Exemplo de Integração (Python)</h3>
+                    <small class="text-secondary">Script CLI para testar todas as rotas.</small>
+                </div>
+            </div>
+
+            <div class="alert alert-dark border border-secondary text-secondary small">
+                <i class="fas fa-robot me-2"></i> <strong>Nota:</strong> Este é um código de exemplo gerado por IA (ChatGPT) para fins didáticos e de teste.
+            </div>
+
+            <pre><code class="language-python">import requests
+
+# ==============================
+# CONFIGURAÇÃO
+# ==============================
+
+API_KEY = "SUA_API_KEY_AQUI" # Substitua pela sua chave
+BASE_URL = "https://olympuspay.squareweb.app/api/v1"
+
+HEADERS = {
+    "Authorization": API_KEY,
+    "Content-Type": "application/json"
+}
+
+# ==============================
+# FUNÇÕES
+# ==============================
+
+def consultar_saldo():
+    try:
+        r = requests.get(f"{BASE_URL}/balance", headers=HEADERS)
+        print("\n🔎 SALDO:")
+        print(r.json())
+    except Exception as e:
+        print(f"Erro: {e}")
+
+def criar_deposito():
+    valor = input("Valor do depósito (ex: 5.90): ").replace(",", ".")
+    try:
+        valor = float(valor)
+    except:
+        print("❌ Valor inválido")
+        return
+
+    payload = {"amount": valor}
+
+    try:
+        r = requests.post(
+            f"{BASE_URL}/pay",
+            headers=HEADERS,
+            json=payload
+        )
+        data = r.json()
+
+        print("\n📥 DEPÓSITO CRIADO")
+        print(data)
+
+        # Tenta recuperar o ID de várias formas
+        payment_id = (
+            data.get("id")
+            or data.get("payment_id")
+            or data.get("order_id")
+            or data.get("reference")
+        )
+
+        if payment_id:
+            print(f"\n🆔 ID DO DEPÓSITO: {payment_id}")
+            print("👉 Use esse ID para consultar o status")
+        else:
+            print("\n⚠️ ATENÇÃO: ID não identificado automaticamente.")
+
+        if "qr_code" in data:
+            print("\n📲 PIX COPIA E COLA:")
+            print(data["qr_code"])
+            
+    except Exception as e:
+        print(f"Erro na requisição: {e}")
+
+def consultar_deposito():
+    payment_id = input("ID do depósito: ").strip()
+    if not payment_id:
+        print("❌ ID inválido")
+        return
+
+    try:
+        r = requests.get(
+            f"{BASE_URL}/payment/{payment_id}",
+            headers=HEADERS
+        )
+        print("\n📊 STATUS DO DEPÓSITO")
+        print(r.json())
+    except Exception as e:
+        print(f"Erro: {e}")
+
+def criar_saque():
+    valor = input("Valor do saque (ex: 10.00): ").replace(",", ".")
+    try:
+        valor = float(valor)
+    except:
+        print("❌ Valor inválido")
+        return
+
+    pix_key = input("Chave PIX: ").strip()
+    key_type = input("Tipo da chave (cpf/email/phone/random) [enter p/ ignorar]: ").strip()
+
+    payload = {
+        "amount": valor,
+        "pix_key": pix_key
+    }
+
+    if key_type:
+        payload["key_type"] = key_type
+
+    try:
+        r = requests.post(
+            f"{BASE_URL}/withdraw",
+            headers=HEADERS,
+            json=payload
+        )
+        data = r.json()
+
+        print("\n📤 SAQUE CRIADO")
+        print(data)
+
+        withdraw_id = data.get("id")
+
+        if withdraw_id:
+            print(f"\n🆔 ID DO SAQUE: {withdraw_id}")
+            print("👉 Use esse ID para consultar o status")
+            
+    except Exception as e:
+        print(f"Erro: {e}")
+
+def consultar_saque():
+    withdraw_id = input("ID do saque: ").strip()
+    if not withdraw_id:
+        print("❌ ID inválido")
+        return
+
+    try:
+        r = requests.get(
+            f"{BASE_URL}/withdraw/{withdraw_id}",
+            headers=HEADERS
+        )
+        print("\n📊 STATUS DO SAQUE")
+        print(r.json())
+    except Exception as e:
+        print(f"Erro: {e}")
+
+# ==============================
+# MENU
+# ==============================
+
+def menu():
+    while True:
+        print("""
+==============================
+        OLYMPUSPAY CLI
+==============================
+1 - Consultar saldo
+2 - Criar depósito (PIX)
+3 - Consultar depósito
+4 - Criar saque (PIX)
+5 - Consultar saque
+0 - Sair
+""")
+        opcao = input("Escolha: ").strip()
+
+        if opcao == "1": consultar_saldo()
+        elif opcao == "2": criar_deposito()
+        elif opcao == "3": consultar_deposito()
+        elif opcao == "4": criar_saque()
+        elif opcao == "5": consultar_saque()
+        elif opcao == "0": 
+            print("Saindo...")
+            break
+        else:
+            print("❌ Opção inválida")
+
+if __name__ == "__main__":
+    menu()</code></pre>
+        </section>
+
+        <%- include('partials/footer') %>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+        // Inicia o Highlighting
+        hljs.highlightAll();
+
+        // Função do Menu Mobile
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Função de Copiar Código
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.className = 'copy-btn';
+            button.innerHTML = '<i class="fas fa-copy"></i>';
+            
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.innerText).then(() => {
+                    button.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => { button.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+                });
+            });
+
+            const pre = block.parentNode;
+            pre.appendChild(button);
+        });
+
+        // Fechar sidebar ao clicar em um link (no mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if(window.innerWidth < 992) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

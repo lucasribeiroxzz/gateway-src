@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer - OlympusPay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark px-3 mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand text-gradient" href="/dashboard"><i class="fas fa-landmark me-2"></i>OlympusPay</a>
+            <a href="/dashboard" class="btn btn-sm btn-outline-light">Voltar</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="glass-card p-4 mb-4">
+                    <h4 class="mb-4"><i class="fas fa-key text-primary me-2"></i> Credenciais de API</h4>
+                    
+                    <% if(success) { %><div class="alert alert-success bg-opacity-10 border-success text-white"><%= success %></div><% } %>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small text-uppercase fw-bold">Chave de API (Live)</label>
+                        <div class="input-group">
+                            <input type="text" id="apiKeyField" class="form-control font-monospace text-warning bg-dark border-secondary" 
+                                   value="<%= user.apiKey ? '********************************' : 'Nenhuma chave gerada' %>" readonly>
+                            <button class="btn btn-outline-light" onclick="openRevealModal()"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <form action="/developer/generate" method="POST" onsubmit="return confirm('ATENÇÃO: A chave anterior deixará de funcionar imediatamente. Continuar?');">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-sm btn-outline-danger w-100"><i class="fas fa-sync-alt me-2"></i> Revogar e Gerar Nova Chave</button>
+                    </form>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h4 class="mb-4"><i class="fas fa-globe text-secondary me-2"></i> Configuração Webhook</h4>
+                    <form action="/developer/save" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Aplicação</label>
+                            <input type="text" name="integrationName" class="form-control" placeholder="Ex: E-commerce Principal" value="<%= user.integrationName || '' %>">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL de Retorno (Webhook)</label>
+                            <input type="url" name="webhookUrl" class="form-control" placeholder="https://seu-site.com/api/callback" value="<%= user.webhookUrl || '' %>">
+                            <div class="form-text text-muted">Enviaremos um POST para esta URL quando um pagamento for confirmado.</div>
+                        </div>
+                        <button class="btn btn-primary w-100">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h4 class="mb-3"><i class="fas fa-book text-info me-2"></i> Documentação Rápida</h4>
+                        <p class="text-muted">Integre pagamentos em minutos usando nossa API REST.</p>
+                        
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="d-flex align-items-center p-2 rounded bg-dark bg-opacity-50">
+                                <i class="fas fa-check-circle text-success me-3"></i> <span>Criar Cobranças PIX</span>
+                            </div>
+                            <div class="d-flex align-items-center p-2 rounded bg-dark bg-opacity-50">
+                                <i class="fas fa-check-circle text-success me-3"></i> <span>Webhooks em Tempo Real</span>
+                            </div>
+                            <div class="d-flex align-items-center p-2 rounded bg-dark bg-opacity-50">
+                                <i class="fas fa-check-circle text-success me-3"></i> <span>Saques Automatizados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/docs" class="btn btn-outline-light w-100 py-3 fw-bold">
+                        Ler Documentação Completa <i class="fas fa-external-link-alt ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Confirmar Identidade</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Digite sua senha de login para exibir a chave API.</p>
+                    <input type="password" id="confirmPass" class="form-control text-center fs-5" placeholder="••••••••">
+                    <div id="passError" class="text-danger small mt-2 text-center" style="display:none;">Senha incorreta!</div>
+                </div>
+                <div class="modal-footer border-secondary justify-content-center">
+                    <button type="button" class="btn btn-primary px-4" onclick="revealKey()">Revelar Chave</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const passModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+        function openRevealModal() { passModal.show(); }
+        async function revealKey() {
+            const pass = document.getElementById('confirmPass').value;
+            try {
+                const res = await fetch('/developer/reveal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('apiKeyField').value = data.apiKey;
+                    passModal.hide();
+                    document.getElementById('confirmPass').value = '';
+                } else {
+                    document.getElementById('passError').style.display = 'block';
+                }
+            } catch (e) { alert('Erro de conexão.'); }
+        }
+    </script>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

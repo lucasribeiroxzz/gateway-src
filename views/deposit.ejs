@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Depositar | OlympusPay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="glass-card p-4">
+                    <h3 class="text-white mb-4"><i class="fas fa-qrcode"></i> Depósito via PIX</h3>
+                    
+                    <% if (error) { %>
+                        <div class="alert alert-danger"><%= error %></div>
+                    <% } %>
+
+                    <% if (!qr_code) { %>
+                        <form action="/deposit" method="POST" id="depositForm" onsubmit="return validateDeposit()">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <input type="hidden" name="_depositToken" id="_depositToken" value="<%= typeof depositToken !== 'undefined' ? depositToken : '' %>">
+                            <input type="hidden" name="_depositTime" id="_depositTime" value="<%= typeof depositTime !== 'undefined' ? depositTime : '' %>">
+                            <input type="hidden" name="_fp" id="_fp" value="">
+                            <div class="mb-3">
+                                <label class="text-white">Valor (R$)</label>
+                                <input type="number" step="0.01" name="amount" id="amountInput" class="form-control" placeholder="0,00" required autocomplete="off">
+                                <small class="text-muted">Mínimo: R$ 5,00 - Taxa: R$ <%= parseFloat(settings.fee_dep).toFixed(2) %></small>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100" id="submitBtn" disabled>
+                                <span id="btnText">Gerar PIX</span>
+                                <span id="btnLoading" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Processando...</span>
+                            </button>
+                            <small class="text-muted d-block text-center mt-2" id="securityNote">
+                                <i class="fas fa-shield-alt text-success"></i> Ambiente protegido
+                            </small>
+                        </form>
+                        <a href="/dashboard" class="btn btn-outline-light w-100 mt-2">Voltar</a>
+                    
+                    <% } else { %>
+                        
+                        <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="alert-heading fw-bold mb-1">Aguardando Confirmação</h6>
+                                    <p class="mb-0 small">
+                                        A aprovação automática pode levar até <strong>30 minutos</strong> dependendo do banco.
+                                        <br>
+                                        Após pagar no seu banco, <strong>clique no botão verde abaixo</strong> para liberar seu saldo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-white">Escaneie o QR Code abaixo:</p>
+                            <img src="<%= qr_code %>" class="img-fluid rounded mb-3" style="max-width: 250px; border: 5px solid white;">
+                            
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" value="<%= code %>" id="pixCode" readonly>
+                                <button class="btn btn-outline-light" onclick="copyPix()">Copiar</button>
+                            </div>
+
+                            <div id="autoCheckStatus" class="mb-3">
+                                <small class="text-muted"><i class="fas fa-sync fa-spin"></i> Verificando pagamento automaticamente...</small>
+                            </div>
+
+                            <button id="btnCheck" onclick="verificarPagamentoManual('<%= tx_id %>')" class="btn btn-success btn-lg w-100 fw-bold animate__animated animate__pulse animate__infinite shadow">
+                                <i class="fas fa-check-circle me-2"></i> JÁ FIZ O PAGAMENTO
+                            </button>
+                            
+                            <p id="statusMsg" class="mt-3 text-warning fw-bold"></p>
+
+                            <a href="/dashboard" class="btn btn-sm btn-outline-secondary mt-3">Voltar ao Dashboard</a>
+                        </div>
+                        
+                        <input type="hidden" id="paymentId" value="<%= tx_id %>">
+                        <input type="hidden" id="csrfToken" value="<%= csrfToken %>">
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formReady = false;
+        let interactionCount = 0;
+        const pageLoadTime = Date.now();
+        
+        function generateFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('OlympusPay', 2, 2);
+            const canvasData = canvas.toDataURL();
+            
+            const fp = {
+                screen: window.screen.width + 'x' + window.screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                language: navigator.language,
+                platform: navigator.platform,
+                canvas: canvasData.slice(-50),
+                time: Date.now()
+            };
+            return btoa(JSON.stringify(fp));
+        }
+        
+        function trackInteraction() {
+            interactionCount++;
+            if (interactionCount >= 1 && (Date.now() - pageLoadTime) > 1500) {
+                enableForm();
+            }
+        }
+        
+        function enableForm() {
+            if (!formReady) {
+                formReady = true;
+                const btn = document.getElementById('submitBtn');
+                if (btn) {
+                    btn.disabled = false;
+                    document.getElementById('_fp').value = generateFingerprint();
+                }
+            }
+        }
+        
+        function validateDeposit() {
+            const timeSinceLoad = Date.now() - pageLoadTime;
+            
+            if (timeSinceLoad < 2000) {
+                alert('Por favor, aguarde alguns segundos antes de enviar.');
+                return false;
+            }
+            
+            if (interactionCount < 1) {
+                alert('Por favor, interaja com o formulário antes de enviar.');
+                return false;
+            }
+            
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            if (isNaN(amount) || amount < 5) {
+                alert('Valor mínimo é R$ 5,00');
+                return false;
+            }
+            
+            document.getElementById('btnText').style.display = 'none';
+            document.getElementById('btnLoading').style.display = 'inline';
+            document.getElementById('submitBtn').disabled = true;
+            
+            return true;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.getElementById('amountInput');
+            if (amountInput) {
+                amountInput.addEventListener('input', trackInteraction);
+                amountInput.addEventListener('focus', trackInteraction);
+                amountInput.addEventListener('click', trackInteraction);
+            }
+            
+            document.addEventListener('mousemove', function handler() {
+                trackInteraction();
+                document.removeEventListener('mousemove', handler);
+            });
+            
+            document.addEventListener('keydown', function handler() {
+                trackInteraction();
+                document.removeEventListener('keydown', handler);
+            });
+            
+            setTimeout(function() {
+                if (interactionCount >= 1) enableForm();
+            }, 2000);
+        });
+
+        function copyPix() {
+            var copyText = document.getElementById("pixCode");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Código Pix copiado!");
+        }
+
+        let autoCheckInterval = null;
+        let paymentConfirmed = false;
+        
+        async function verificarPagamentoAuto() {
+            if (paymentConfirmed) return;
+            
+            const paymentId = document.getElementById('paymentId')?.value;
+            const csrf = document.getElementById('csrfToken')?.value;
+            
+            if (!paymentId || !csrf) return;
+            
+            try {
+                const response = await fetch('/api/v1/confirmar-pagamento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csrf: csrf, 'payment-id': paymentId })
+                });
+                const result = await response.json();
+                
+                if (result.error && result.error !== 'ID do pagamento inválido') {
+                    paymentConfirmed = true;
+                    clearInterval(autoCheckInterval);
+                    showErrorPopup(result.error);
+                    return;
+                }
+                
+                if (result.pago === true) {
+                    paymentConfirmed = true;
+                    clearInterval(autoCheckInterval);
+                    mostrarAprovado(result.valor || 0);
+                }
+            } catch (e) {
+                console.error('Erro auto-check:', e);
+            }
+        }
+        
+        function mostrarAprovado(valor) {
+            const btn = document.getElementById('btnCheck');
+            const msg = document.getElementById('statusMsg');
+            const autoStatus = document.getElementById('autoCheckStatus');
+            
+            if (autoStatus) autoStatus.innerHTML = '<small class="text-success"><i class="fas fa-check-circle"></i> Pagamento confirmado!</small>';
+            
+            btn.classList.remove('animate__pulse', 'animate__infinite');
+            btn.className = 'btn btn-success btn-lg w-100 fw-bold';
+            btn.innerHTML = '<i class="fas fa-check-circle me-2"></i> PAGAMENTO APROVADO!';
+            btn.disabled = true;
+            
+            msg.className = 'mt-3 text-success fw-bold fs-5';
+            msg.innerHTML = '<i class="fas fa-check"></i> Depósito de R$ ' + (valor ? valor.toFixed(2) : '0.00') + ' confirmado!';
+            
+            showSuccessPopup(valor);
+            
+            setTimeout(() => { window.location.href = '/dashboard'; }, 3000);
+        }
+        
+        function showSuccessPopup(valor) {
+            const popup = document.createElement('div');
+            popup.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            popup.innerHTML = `
+                <div style="background:linear-gradient(135deg,#10b981,#059669);padding:40px;border-radius:20px;text-align:center;animation:popIn 0.3s ease;">
+                    <i class="fas fa-check-circle" style="font-size:80px;color:white;margin-bottom:20px;"></i>
+                    <h2 style="color:white;margin-bottom:10px;">Depósito Aprovado!</h2>
+                    <p style="color:rgba(255,255,255,0.9);font-size:24px;font-weight:bold;">R$ ${valor ? valor.toFixed(2) : '0.00'}</p>
+                    <p style="color:rgba(255,255,255,0.7);margin-top:15px;">Redirecionando...</p>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+        
+        function showErrorPopup(mensagem) {
+            const popup = document.createElement('div');
+            popup.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            popup.innerHTML = `
+                <div style="background:linear-gradient(135deg,#ef4444,#dc2626);padding:40px;border-radius:20px;text-align:center;animation:popIn 0.3s ease;max-width:400px;">
+                    <i class="fas fa-times-circle" style="font-size:80px;color:white;margin-bottom:20px;"></i>
+                    <h2 style="color:white;margin-bottom:10px;">Erro no Depósito</h2>
+                    <p style="color:rgba(255,255,255,0.9);font-size:16px;">${mensagem}</p>
+                    <button onclick="this.parentElement.parentElement.remove();" style="margin-top:20px;padding:10px 30px;background:white;color:#dc2626;border:none;border-radius:10px;font-weight:bold;cursor:pointer;">Fechar</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+        
+        async function verificarPagamentoManual(id) {
+            if (paymentConfirmed) return;
+            
+            const btn = document.getElementById('btnCheck');
+            const msg = document.getElementById('statusMsg');
+            const csrf = document.getElementById('csrfToken')?.value;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            btn.classList.remove('animate__pulse', 'animate__infinite');
+
+            try {
+                const response = await fetch('/api/v1/confirmar-pagamento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csrf: csrf, 'payment-id': id })
+                });
+                const result = await response.json();
+
+                if (result.pago === true) {
+                    paymentConfirmed = true;
+                    clearInterval(autoCheckInterval);
+                    msg.className = 'mt-3 text-success fw-bold fs-5';
+                    msg.innerHTML = '<i class="fas fa-check"></i> Depósito confirmado!';
+                    btn.className = 'btn btn-success w-100';
+                    btn.innerHTML = 'PAGAMENTO APROVADO!';
+                    showSuccessPopup(result.valor || 0);
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 3000);
+                } else if (result.error) {
+                    msg.className = 'mt-3 text-danger';
+                    msg.innerText = result.error;
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-redo"></i> TENTAR NOVAMENTE';
+                    btn.classList.add('animate__pulse', 'animate__infinite');
+                } else {
+                    msg.className = 'mt-3 text-warning';
+                    msg.innerText = "Ainda não identificado. Aguarde alguns segundos.";
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-redo"></i> TENTAR NOVAMENTE';
+                    btn.classList.add('animate__pulse', 'animate__infinite');
+                }
+            } catch (e) {
+                console.error(e);
+                btn.disabled = false;
+                btn.innerText = 'Erro ao verificar (Tente de novo)';
+                msg.innerText = "Erro de conexão com o servidor.";
+                btn.classList.add('animate__pulse', 'animate__infinite');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentId = document.getElementById('paymentId')?.value;
+            if (paymentId) {
+                autoCheckInterval = setInterval(verificarPagamentoAuto, 1500);
+                verificarPagamentoAuto();
+            }
+        });
+    </script>
+    
+    <style>
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

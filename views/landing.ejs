@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OlympusPay | Pagamentos Anônimos e Seguros</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --accent: #06b6d4;
+            --bg-dark: #020617;
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --text-main: #ffffff;
+            --text-muted: #cbd5e1; 
+            --christmas-red: #dc2626;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- EFEITO DE NEVE (Natal) --- */
+        .snowflake {
+            position: fixed; top: -10px; color: #fff; font-size: 1em; font-family: Arial;
+            text-shadow: 0 0 1px #000; z-index: 9999; pointer-events: none;
+            animation: fall linear forwards; opacity: 0.3;
+        }
+        @keyframes fall { to { transform: translateY(105vh); } }
+
+        /* --- AVISO DE TOPO --- */
+        .promo-banner {
+            background: linear-gradient(90deg, var(--christmas-red) 0%, #991b1b 100%);
+            color: white; text-align: center; padding: 10px; font-size: 0.95rem; font-weight: 600;
+            position: relative; z-index: 1050;
+        }
+
+        /* --- BACKGROUND GLOW --- */
+        .bg-glow {
+            position: absolute; width: 100%; height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(0,0,0,0) 60%);
+            top: 0; left: 0; z-index: -1; pointer-events: none;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 15px 0;
+        }
+        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem; }
+        .nav-link { color: var(--text-muted) !important; font-weight: 500; transition: 0.3s; }
+        .nav-link:hover { color: white !important; }
+        
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none; color: white; font-weight: 700; padding: 10px 28px;
+            border-radius: 50px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: 0.3s;
+        }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5); color: white; }
+
+        /* --- HERO SECTION --- */
+        .hero-section { padding: 100px 0 80px; position: relative; }
+        .hero-title {
+            font-size: 4rem; font-weight: 800; line-height: 1.1;
+            background: linear-gradient(to right, #fff, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+        }
+        .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 750px; margin: 0 auto 40px; line-height: 1.6; }
+
+        /* --- SECTION HEADERS --- */
+        .section-header { margin-bottom: 60px; text-align: center; }
+        .section-header h2 { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 15px; }
+        .section-header p { font-size: 1.15rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        /* --- GRID ESTILO BANCO --- */
+        .bank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .bank-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 35px; border-radius: 20px; transition: 0.3s;
+            position: relative; overflow: hidden; backdrop-filter: blur(10px);
+        }
+        .bank-card:hover {
+            background: rgba(40, 55, 75, 0.8); border-color: var(--primary);
+            transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+        .bank-icon {
+            width: 55px; height: 55px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: var(--primary); margin-bottom: 25px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .bank-card h4 { font-size: 1.35rem; font-weight: 700; color: white; margin-bottom: 15px; }
+        .bank-card p { font-size: 1rem; color: #e2e8f0; line-height: 1.7; margin: 0; }
+
+        /* --- D+0 HIGHLIGHT --- */
+        .d0-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
+            border-radius: 24px; border: 1px solid rgba(255,255,255,0.15);
+            padding: 60px; margin: 80px 0; position: relative; overflow: hidden;
+        }
+        .d0-badge {
+            background: var(--accent); color: #020617; font-weight: 800; padding: 6px 16px;
+            border-radius: 8px; font-size: 0.9rem; text-transform: uppercase; display: inline-block; margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        /* --- FEES & FEATURES --- */
+        .fee-card {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 1) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            padding: 40px 30px; text-align: center; height: 100%; transition: 0.3s;
+        }
+        .fee-card:hover { border-color: var(--accent); transform: scale(1.02); }
+        .fee-amount { font-size: 3rem; font-weight: 800; color: white; line-height: 1.2; }
+        .fee-label { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 15px; font-weight: 600; }
+        
+        .check-list li {
+            display: flex; align-items: center; margin-bottom: 18px;
+            color: #e2e8f0; 
+            font-size: 1.05rem;
+        }
+        .check-list li i { color: var(--accent); margin-right: 15px; font-size: 1.2rem; filter: drop-shadow(0 0 5px rgba(6,182,212,0.5)); }
+
+        /* --- STATS SECTION (CONTADORES) --- */
+        .stats-container { margin: 80px 0; }
+        .stat-box {
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 40px 20px; backdrop-filter: blur(10px);
+            text-align: center; transition: 0.3s;
+        }
+        .stat-box:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .stat-number { font-size: 3.5rem; font-weight: 800; color: white; line-height: 1; margin-bottom: 10px; }
+        .stat-label { color: var(--text-muted); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; font-weight: 700; }
+
+        /* --- FAQ --- */
+        .accordion-item { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .accordion-button { background: transparent; color: white; font-weight: 700; box-shadow: none !important; padding: 25px 0; font-size: 1.15rem; }
+        .accordion-button:not(.collapsed) { background: transparent; color: var(--primary); }
+        .accordion-button::after { filter: invert(1) brightness(2); }
+        .accordion-body { color: var(--text-muted); padding: 0 0 25px 0; font-size: 1.05rem; line-height: 1.7; }
+
+        /* --- FOOTER --- */
+        footer { background: #0b1120; border-top: 1px solid rgba(255,255,255,0.05); padding: 70px 0 30px; margin-top: 100px; }
+        .social-btn {
+            width: 45px; height: 45px; background: rgba(255,255,255,0.08);
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: white; margin: 0 8px; transition: 0.3s; text-decoration: none; font-size: 1.2rem;
+        }
+        .social-btn:hover { background: var(--primary); color: white; transform: scale(1.1); box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+        
+        .float-tg {
+            position: fixed; bottom: 30px; right: 30px;
+            background: linear-gradient(135deg, #0088cc, #005f8f); width: 65px; height: 65px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; color: white; box-shadow: 0 10px 25px rgba(0, 136, 204, 0.5);
+            z-index: 1000; transition: 0.3s; text-decoration: none;
+        }
+        .float-tg:hover { transform: scale(1.1) rotate(10deg); color: white; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.8rem; }
+            .hero-section { padding-top: 60px; }
+            .d0-section { text-align: center; padding: 40px 25px; }
+            .bank-grid { grid-template-columns: 1fr; }
+            .fee-amount { font-size: 2.5rem; }
+            .stat-number { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="promo-banner">
+        <i class="fas fa-gift me-2"></i> PROMOÇÃO DE FIM DE ANO: Taxas reduzidas por tempo limitado! <i class="fas fa-snowflake ms-2"></i>
+    </div>
+
+    <div class="bg-glow"></div>
+    <div id="snow-container"></div>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-white" href="#">
+                <i class="fas fa-landmark text-warning me-2"></i>OlympusPay
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link px-3" href="#benefits">Vantagens</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#pricing">Taxas</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#stats">Estatísticas</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#faq">FAQ</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="/login" class="btn text-white fw-bold">Entrar</a>
+                    <a href="/register" class="btn btn-register">Criar Conta</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section text-center">
+        <div class="container">
+            <div class="d-inline-block px-4 py-2 rounded-pill border border-secondary mb-4" style="background: rgba(139, 92, 246, 0.15); backdrop-filter: blur(5px);">
+                <small class="text-white fw-bold" style="letter-spacing: 0.5px;"><i class="fas fa-shield-alt text-success me-2"></i> API Blindada contra Bloqueios & MED</small>
+            </div>
+            
+            <h1 class="hero-title">O Futuro dos Pagamentos<br>Anônimos e Seguros</h1>
+            <p class="hero-subtitle">
+                A solução completa de PIX automatizado para sua operação digital. 
+                Sem risco de MED, sem exposição de dados e com <strong>aprovação instantânea</strong>.
+            </p>
+
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a href="/register" class="btn btn-register px-5 py-3 fs-6 shadow-lg">Começar Agora <i class="fas fa-arrow-right ms-2"></i></a>
+                <a href="/docs" class="btn btn-outline-light px-5 py-3 rounded-pill fw-bold border-2">Ver Documentação</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="benefits" class="py-5">
+        <div class="container">
+            <div class="section-header">
+                <h2>Por que escolher a OlympusPay?</h2>
+                <p>Mais do que uma plataforma, um parceiro financeiro completo para escalar seu negócio digital com segurança.</p>
+            </div>
+
+            <div class="bank-grid">
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-zap"></i></div>
+                    <h4>Saque Instantâneo</h4>
+                    <p>Receba suas vendas na hora via Pix. Seu dinheiro disponível imediatamente na sua conta bancária, 24/7, sem travas.</p>
+                </div>
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-university"></i></div>
+                    <h4>Multiadquirência</h4>
+                    <p>Processamento inteligente com rotação entre múltiplos bancos para garantir a máxima taxa de aprovação.</p>
+                </div>
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-shield-virus"></i></div>
+                    <h4>Zero Risco de MED</h4>
+                    <p>Infraestrutura proprietária anti-bloqueio. Blindamos sua operação contra o Mecanismo Especial de Devolução.</p>
+                </div>
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Conversão Alta</h4>
+                    <p>Checkout de alta performance com order bumps e upsells nativos de um clique para maximizar seu lucro.</p>
+                </div>
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h4>Checkout Editável</h4>
+                    <p>Personalize cores, textos, e campos. Adapte o checkout para a identidade visual da sua marca.</p>
+                </div>
+                <div class="bank-card">
+                    <div class="bank-icon"><i class="fas fa-user-secret"></i></div>
+                    <h4>100% Anônimo</h4>
+                    <p>Sigilo total. Aceitamos dados fictícios para cadastro de produtos e exibição no checkout.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="d0-section">
+            <div class="row align-items-center">
+                <div class="col-lg-7 z-2">
+                    <span class="d0-badge"><i class="fas fa-check-circle me-1"></i> Disponibilidade Imediata</span>
+                    <h2 class="display-5 fw-bold text-white mb-3">Saque Instantâneo via Pix</h2>
+                    <p class="fs-5 text-white-50 mb-5">Vendeu, recebeu. Sem espera de dias, sem burocracia e sem retenção de saldo. Fluxo de caixa real para seu negócio.</p>
+                    
+                    <div class="d-flex align-items-center gap-5 mb-5">
+                        <div>
+                            <h3 class="text-white fw-bold mb-1 display-6">D+0</h3>
+                            <small class="text-muted text-uppercase fw-bold">Liquidação</small>
+                        </div>
+                        <div class="border-start border-secondary h-100 ps-5">
+                            <h3 class="text-white fw-bold mb-1 display-6">24/7</h3>
+                            <small class="text-muted text-uppercase fw-bold">Operação Full-time</small>
+                        </div>
+                    </div>
+                    
+                    <a href="/register" class="btn btn-light rounded-pill fw-bold px-5 py-3">Solicitar Acesso <i class="fas fa-chevron-right ms-2"></i></a>
+                </div>
+                <div class="col-lg-5 text-center mt-5 mt-lg-0 z-1">
+                    <div style="position: relative;">
+                        <i class="fas fa-mobile-alt text-white" style="font-size: 12rem; opacity: 0.1;"></i>
+                        <i class="fas fa-hand-holding-usd text-accent" style="font-size: 8rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 30px var(--accent));"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-5">
+        <div class="container">
+            <div class="row gy-5">
+                <div class="col-lg-5">
+                    <h3 class="text-white fw-bold mb-4 display-6">Nossas Taxas</h3>
+                    <p class="text-muted mb-4">Transparência total. Sem mensalidades ou letras miúdas.</p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="fee-card">
+                                <div class="fee-label">Depósito (Pix)</div>
+                                <div class="fee-amount text-success">R$ 1</div>
+                                <small class="text-muted fw-bold mt-2 d-block">Por transação aprovada</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="fee-card">
+                                <div class="fee-label">Saque (Pix)</div>
+                                <div class="fee-amount text-primary">R$ 2</div>
+                                <small class="text-muted fw-bold mt-2 d-block">Taxa fixa por saque</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 rounded bg-opacity-10 bg-danger border border-danger text-center">
+                        <small class="text-danger fw-bold text-uppercase"><i class="fas fa-gift me-2"></i> Taxas promocionais de Natal ativas!</small>
+                    </div>
+                </div>
+
+                <div class="col-lg-7 ps-lg-5">
+                    <h3 class="text-white fw-bold mb-4 display-6">Menos vendas negadas, mais dinheiro no caixa</h3>
+                    <p class="text-muted mb-5 fs-5">Nossa tecnologia proprietária garante mais aprovações e melhora seus resultados. Tudo que você precisa para escalar seu negócio digital em um só lugar.</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <ul class="check-list list-unstyled">
+                                <li><i class="fas fa-check-circle"></i> Cadastro de produtos em minutos</li>
+                                <li><i class="fas fa-check-circle"></i> Order bumps e upsells nativos</li>
+                                <li><i class="fas fa-check-circle"></i> Painel com métricas em tempo real</li>
+                                <li><i class="fas fa-check-circle"></i> API Restful completa e documentada</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="check-list list-unstyled">
+                                <li><i class="fas fa-check-circle"></i> Checkout 100% personalizável</li>
+                                <li><i class="fas fa-check-circle"></i> Webhooks de alta performance</li>
+                                <li><i class="fas fa-check-circle"></i> Suporte premium via Telegram</li>
+                                <li><i class="fas fa-check-circle"></i> Anonimato garantido na operação</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="stats-container">
+        <div class="container">
+             <div class="section-header">
+                <h2>Números da Operação</h2>
+                <p>Escalabilidade e robustez comprovadas em tempo real.</p>
+            </div>
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <div class="stat-box">
+                        <div class="stat-number text-primary counter" data-val="<%= totalUsers %>">0</div>
+                        <div class="stat-label">Usuários Ativos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-box">
+                        <div class="stat-number text-success">
+                            <span style="font-size: 2rem; vertical-align: middle; margin-right: 5px;">R$</span> 
+                            <span class="counter-money" data-val="<%= totalVolume %>">0,00</span>
+                        </div>
+                        <div class="stat-label">Volume Total Processado</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-box">
+                        <div class="stat-number text-info"><i class="fas fa-wifi me-2"></i>99.9%</div>
+                        <div class="stat-label">Uptime da API</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="py-5 mb-5">
+        <div class="container" style="max-width: 900px;">
+            <div class="section-header mb-5">
+                <h2>Perguntas Frequentes</h2>
+                <p>Tire suas dúvidas sobre nossa operação e segurança.</p>
+            </div>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            <i class="fas fa-question-circle me-3 text-primary"></i> Como funciona o sistema Anti-MED e Bloqueios?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Utilizamos uma infraestrutura complexa de contas intermediárias e tecnologia proprietária de "roteamento dinâmico". Isso impede que solicitações de devolução (MED) atinjam seu saldo principal, garantindo que seu faturamento esteja sempre seguro e disponível.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <i class="fas fa-user-shield me-3 text-primary"></i> Preciso usar meu CPF/Nome real no checkout?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <strong>Não.</strong> Prezamos pelo total anonimato da sua operação. Você pode configurar nomes, CPFs e dados fictícios ("laranjas") na exibição do checkout e no cadastro de produtos. Seus dados reais nunca são expostos aos clientes finais.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <i class="fas fa-clock me-3 text-primary"></i> Em quanto tempo recebo o dinheiro na minha conta?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Trabalhamos exclusivamente com o modelo <strong>D+0 Instantâneo</strong>. Assim que o cliente paga o Pix no checkout, o valor é processado e, após a dedução automática das taxas, fica disponível para saque imediato para sua conta bancária de preferência, 24 horas por dia.
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            <i class="fas fa-code me-3 text-primary"></i> A integração é difícil?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Extremamente simples. Nossa API é moderna, RESTful e bem documentada. Além disso, fornecemos SDKs e exemplos de integração. Seus webhooks são disparados em milissegundos após a confirmação do pagamento.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container text-center">
+            <h4 class="text-white fw-bold mb-4 display-6"><i class="fas fa-landmark text-primary me-2"></i>OlympusPay</h4>
+            
+            <div class="d-flex justify-content-center gap-2 mb-5">
+                <a href="https://t.me/olympuspaybr" target="_blank" class="social-btn" title="Grupo Telegram"><i class="fab fa-telegram-plane"></i></a>
+                <a href="https://instagram.com/olympuspay" target="_blank" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://discord.gg/W6HKdNzrVH" target="_blank" class="social-btn" title="Discord"><i class="fab fa-discord"></i></a>
+                <a href="https://t.me/lucassxofc" target="_blank" class="social-btn" title="Suporte Direto"><i class="fas fa-headset"></i></a>
+            </div>
+
+            <div class="footer-links mb-4 d-flex justify-content-center flex-wrap gap-3">
+                <a href="/terms" class="text-muted text-decoration-none hover-white">Termos de Uso</a>
+                <span class="text-muted d-none d-md-block">•</span>
+                <a href="/privacy" class="text-muted text-decoration-none hover-white">Política de Privacidade</a>
+                <span class="text-muted d-none d-md-block">•</span>
+                <a href="/docs" class="text-muted text-decoration-none hover-white">Documentação API</a>
+                <span class="text-muted d-none d-md-block">•</span>
+                <a href="/login" class="text-muted text-decoration-none hover-white">Área do Cliente</a>
+            </div>
+
+            <p class="text-muted mb-2">© 2025 OlympusPay. Todos os direitos reservados. Tecnologia de Pagamentos de Alta Performance.</p>
+            <p class="text-white-50 small" style="font-family: monospace; letter-spacing: 1px;">CNPJ: 88.530.808/0001-21</p>
+        </div>
+    </footer>
+
+    <a href="https://t.me/lucassxofc" target="_blank" class="float-tg">
+        <i class="fab fa-telegram-plane"></i>
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // --- Script de Neve ---
+        function createSnow() {
+            const container = document.getElementById('snow-container');
+            const snowCount = 35;
+            for(let i = 0; i < snowCount; i++) {
+                createSingleFlake(container, true);
+            }
+        }
+        function createSingleFlake(container, initial = false) {
+            const flake = document.createElement('div');
+            flake.classList.add('snowflake');
+            flake.innerHTML = '❅';
+            flake.style.left = Math.random() * 100 + 'vw';
+            flake.style.animationDuration = Math.random() * 5 + 3 + 's';
+            flake.style.opacity = Math.random() * 0.4 + 0.1;
+            flake.style.fontSize = Math.random() * 12 + 8 + 'px';
+            if (initial) flake.style.animationDelay = Math.random() * -5 + 's';
+            container.appendChild(flake);
+            flake.addEventListener('animationend', () => { flake.remove(); createSingleFlake(container); });
+        }
+
+        // --- Script de Contadores Animados ---
+        function animateCounter(obj, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * end);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function animateMoney(obj, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentVal = progress * end;
+                obj.innerHTML = currentVal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            createSnow();
+
+            // Inicia animação dos contadores pegando o valor das tags EJS
+            const userCounter = document.querySelector(".counter");
+            if (userCounter) {
+                // Aqui ele vai ler o valor injetado pelo backend (Node/EJS)
+                const finalUsers = parseInt(userCounter.getAttribute("data-val")) || 0;
+                animateCounter(userCounter, finalUsers, 2500);
+            }
+
+            const moneyCounter = document.querySelector(".counter-money");
+            if (moneyCounter) {
+                // Aqui ele vai ler o valor injetado pelo backend (Node/EJS)
+                const finalMoney = parseFloat(moneyCounter.getAttribute("data-val")) || 0;
+                animateMoney(moneyCounter, finalMoney, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso | OlympusPay</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.7;
+        }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0) 100%);
+            padding: 80px 0 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        /* Conteúdo */
+        .terms-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .term-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+        .term-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .term-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        h3 { color: white; font-weight: 700; margin-bottom: 15px; font-size: 1.3rem; }
+        p, li { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 10px; }
+        
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+
+        /* Destaques */
+        .highlight-box {
+            background: rgba(139, 92, 246, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+        .highlight-text { color: #e2e8f0; font-weight: 600; }
+
+        /* Footer */
+        .footer-nav {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            border-radius: 50px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .btn-back:hover {
+            background: white;
+            color: var(--bg-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <div class="container">
+            <div class="d-inline-block px-3 py-1 rounded-pill border border-secondary mb-3 text-warning bg-dark">
+                <small><i class="fas fa-balance-scale me-1"></i> Atualizado em 2025</small>
+            </div>
+            <h1 class="page-title">Termos de Uso e Serviços</h1>
+            <p class="text-muted">Leia atentamente as condições de uso da plataforma OlympusPay.</p>
+        </div>
+    </header>
+
+    <div class="terms-container">
+
+        <div class="term-card">
+            <i class="fas fa-handshake term-icon"></i>
+            <h3>1. Aceitação dos Termos</h3>
+            <p>Ao criar uma conta na OlympusPay, você concorda expressamente com todos os termos aqui descritos. A OlympusPay atua como uma intermediadora tecnológica de pagamentos (Gateway), facilitando transações via PIX de forma automatizada.</p>
+        </div>
+
+        <div class="term-card border-warning" style="border-color: rgba(250, 204, 21, 0.3) !important;">
+            <i class="fas fa-user-shield term-icon text-warning"></i>
+            <h3 class="text-white">2. Privacidade e Anonimato (Política Zero-KYC)</h3>
+            <p>Prezamos pela privacidade absoluta de nossos parceiros. Diferente de bancos tradicionais:</p>
+            <ul>
+                <li><strong>Não exigimos envio de documentos</strong> (RG, CNH, CPF ou CNPJ) para ativação de conta.</li>
+                <li><strong>Não exigimos selfies</strong> ou comprovação de renda.</li>
+                <li>Seus dados de acesso (Login/Senha) são criptografados e de uso exclusivo seu.</li>
+            </ul>
+            <div class="highlight-box">
+                <span class="highlight-text">Nota:</span> A ausência de burocracia visa agilizar sua operação. Você é o único responsável pela segurança de suas credenciais.
+            </div>
+        </div>
+
+        <div class="term-card border-success" style="border-color: rgba(74, 222, 128, 0.3) !important;">
+            <i class="fas fa-unlock-alt term-icon text-success"></i>
+            <h3 class="text-white">3. Segurança Financeira e Bloqueios</h3>
+            <p>Entendemos as dores do mercado digital. Por isso, estabelecemos a política de <strong>Livre Movimentação</strong>:</p>
+            <ul>
+                <li><strong>Sem Bloqueios Preventivos:</strong> Não realizamos bloqueios de saldo por "suspeita de movimentação atípica" ou alto volume.</li>
+                <li><strong>Saques Imediatos:</strong> O saldo disponível em sua conta pertence a você e pode ser sacado a qualquer momento, 24/7.</li>
+                <li><strong>Proteção Anti-MED:</strong> Utilizamos infraestrutura avançada para mitigar riscos de devoluções maliciosas (Mecanismo Especial de Devolução).</li>
+            </ul>
+        </div>
+
+        <div class="term-card">
+            <i class="fas fa-percentage term-icon"></i>
+            <h3>4. Taxas e Tarifas</h3>
+            <p>Nossa monetização ocorre exclusivamente através de taxas sobre transações bem-sucedidas.</p>
+            <ul>
+                <li>As taxas de Depósito (Entrada) e Saque (Saída) são fixas ou percentuais, conforme configurado no seu painel.</li>
+                <li>Não cobramos mensalidades ou taxas de manutenção de conta inativa.</li>
+                <li>A OlympusPay reserva-se o direito de alterar as taxas, mediante aviso no painel.</li>
+            </ul>
+        </div>
+
+        <div class="term-card">
+            <i class="fas fa-gavel term-icon"></i>
+            <h3>5. Responsabilidades e Uso Proibido</h3>
+            <p>Embora garantamos anonimato, a OlympusPay não compactua com crimes financeiros graves.</p>
+            <p>É estritamente proibido utilizar a plataforma para:</p>
+            <ul>
+                <li>Financiamento ao terrorismo ou tráfico de pessoas.</li>
+                <li>Exploração infantil ou conteúdo ilegal extremo.</li>
+                <li>Lavagem de dinheiro comprovada judicialmente.</li>
+            </ul>
+            <p>A OlympusPay é apenas a processadora tecnológica. A responsabilidade sobre o produto/serviço vendido, entrega e suporte ao consumidor final é 100% do usuário titular da conta.</p>
+        </div>
+
+        <div class="footer-nav">
+            <p class="mb-4 text-muted">Ao continuar utilizando a plataforma, você declara estar ciente e de acordo com as cláusulas acima.</p>
+            <a href="/" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

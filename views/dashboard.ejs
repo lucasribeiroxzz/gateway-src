@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | OlympusPay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2234;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glow-primary: rgba(99, 102, 241, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(ellipse at 10% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .text-muted { color: var(--text-secondary) !important; }
+
+        .navbar {
+            background: rgba(10, 15, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bank-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(79, 70, 229, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 35px 60px -15px rgba(79, 70, 229, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        .bank-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .bank-card::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: -100%;
+            width: 300%; height: 300%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-50%) translateY(-50%) rotate(45deg); }
+            100% { transform: translateX(50%) translateY(50%) rotate(45deg); }
+        }
+
+        .card-chip {
+            width: 48px; height: 36px;
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%; height: 60%;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+
+        .balance-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            line-height: 1.1;
+        }
+
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .card-badge {
+            background: rgba(255,255,255,0.95);
+            color: #1e1b4b;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px -10px var(--glow-primary);
+        }
+
+        .action-btn:hover::before { opacity: 0.1; }
+
+        .action-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            color: var(--primary-light);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-btn:hover .action-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px -5px var(--glow-primary);
+        }
+
+        .action-btn span {
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h5 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .panel-header a {
+            color: var(--primary-light);
+            font-size: 0.85rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .panel-header a:hover { color: #fff; }
+
+        .transaction-row {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .transaction-row:last-child { border-bottom: none; }
+        .transaction-row:hover { background: var(--bg-card-hover); }
+
+        .tx-icon-box {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .tx-icon-box.deposit {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .tx-icon-box.withdraw {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .tx-info { flex: 1; min-width: 0; }
+
+        .tx-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .tx-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .tx-amount {
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: right;
+        }
+
+        .tx-amount.positive { color: var(--success); }
+        .tx-amount.negative { color: var(--text-primary); }
+
+        .badge-status {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-pay-now {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            border: none;
+            color: #000;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 8px;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-pay-now:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            color: #000;
+        }
+
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .user-avatar-btn {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-avatar-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow-primary);
+        }
+
+        .dropdown-menu {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .dropdown-item {
+            color: var(--text-secondary);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            color: var(--text-primary);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 24px;
+        }
+
+        .modal-body { padding: 24px; }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 16px 24px;
+        }
+
+        .form-control {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            background: var(--bg-dark);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px var(--glow-primary);
+        }
+
+        .form-control::placeholder { color: var(--text-secondary); }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px var(--glow-primary);
+        }
+
+        .btn-secondary {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 10px 24px;
+            border-radius: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: none;
+            color: #000;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .admin-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+            color: #000;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .balance-value { font-size: 2rem; }
+            .bank-card { padding: 24px 20px; min-height: 200px; }
+            .action-btn { padding: 20px 12px; }
+            .action-icon { width: 48px; height: 48px; font-size: 1.1rem; }
+            .transaction-row { padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/dashboard">
+                <i class="fas fa-landmark text-warning"></i> OlympusPay
+            </a>
+            
+            <div class="d-flex gap-3 align-items-center">
+                <% if(user.isAdmin) { %>
+                    <a href="/admin" class="admin-btn">
+                        <i class="fas fa-crown me-1"></i> ADMIN
+                    </a>
+                <% } %>
+
+                <div class="dropdown">
+                    <img src="<%= user.avatar ? '/avatars/' + user.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png' %>" 
+                         class="user-avatar-btn" 
+                         data-bs-toggle="dropdown"
+                         alt="Perfil">
+                    
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header text-secondary px-3 py-2">Olá, <%= user.name %></h6></li>
+                        <li><hr class="dropdown-divider" style="border-color: var(--border-color);"></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="fas fa-user-edit me-2"></i> Editar Perfil
+                        </a></li>
+                        <li><a class="dropdown-item text-danger" href="/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i> Sair
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container" style="margin-top: 100px;">
+            
+            <div class="row g-4 mb-5">
+                <div class="col-lg-5 col-md-12">
+                    <div class="bank-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="card-chip"></div>
+                            <i class="fas fa-wifi text-white-50 fs-4" style="transform: rotate(90deg); opacity: 0.6;"></i>
+                        </div>
+                        
+                        <div class="mt-auto">
+                            <p class="balance-label">Saldo Disponível</p>
+                            <h2 class="balance-value mb-3">R$ <%= parseFloat(user.balance).toFixed(2) %></h2>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <span class="card-number">•••• •••• •••• 8842</span>
+                                <span class="card-badge">OLYMPUS BLACK</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7 col-md-12">
+                    <div class="row g-3 h-100">
+                        <div class="col-6 col-md-3">
+                            <a href="/deposit" class="action-btn">
+                                <div class="action-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <span>Depositar</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/withdraw" class="action-btn">
+                                <div class="action-icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <span>Sacar</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/estatisticas" class="action-btn">
+                                <div class="action-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <span>Estatísticas</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/developer" class="action-btn">
+                                <div class="action-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <span>API</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="https://t.me/lucassxofc" target="_blank" class="action-btn">
+                                <div class="action-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <span>Suporte</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="glass-panel">
+                        <div class="panel-header">
+                            <h5><i class="fas fa-history me-2 text-primary"></i>Extrato Recente</h5>
+                            <a href="#">Ver tudo <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+
+                        <% if(txs.length === 0) { %>
+                            <div class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>Nenhuma movimentação recente.</p>
+                            </div>
+                        <% } else { %>
+                            <% txs.forEach(function(tx) { %>
+                                <div class="transaction-row">
+                                    <div class="tx-icon-box <%= tx.type === 'deposit' ? 'deposit' : 'withdraw' %>">
+                                        <% if(tx.type === 'deposit') { %> 
+                                            <i class="fas fa-arrow-down"></i>
+                                        <% } else { %> 
+                                            <i class="fas fa-paper-plane"></i>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="tx-info">
+                                        <div class="tx-title"><%= tx.type === 'deposit' ? 'Depósito via Pix' : 'Transferência Enviada' %></div>
+                                        <div class="tx-date">
+                                            <%= new Date(tx.date).toLocaleDateString('pt-BR', {timeZone: 'America/Sao_Paulo'}) %> às <%= new Date(tx.date).toLocaleTimeString('pt-BR', {timeZone: 'America/Sao_Paulo'}).slice(0,5) %>
+                                            <% if(tx.status === 'pending') { %>
+                                                <span class="badge-status badge-pending ms-2">Pendente</span>
+                                            <% } else if(tx.status === 'failed') { %>
+                                                <span class="badge-status badge-failed ms-2">Falhou</span>
+                                            <% } %>
+                                        </div>
+                                        
+                                        <% if(tx.type === 'deposit' && tx.status === 'pending') { %>
+                                            <a href="/deposit/view/<%= tx.id %>" class="btn btn-pay-now">
+                                                <i class="fas fa-qrcode me-1"></i> Pagar Agora
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="tx-amount <%= tx.type === 'deposit' ? 'positive' : 'negative' %>">
+                                        <%= tx.type === 'deposit' ? '+' : '-' %> R$ <%= parseFloat(tx.val).toFixed(2) %>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Editar Perfil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/update-profile" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-user me-1"></i> Nome de Exibição</label>
+                            <input type="text" name="name" class="form-control" value="<%= user.name %>" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-camera me-1"></i> Novo Avatar</label>
+                            <input type="file" name="avatar" class="form-control" accept="image/*">
+                        </div>
+
+                        <hr style="border-color: var(--border-color); margin: 24px 0;">
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-lock me-1"></i> Alterar Senha</label>
+                            <input type="password" name="password" class="form-control" placeholder="Deixe em branco para manter a atual">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

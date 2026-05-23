@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Estatísticas | OlympusPay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2234;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 10% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .navbar {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-primary) !important;
+        }
+
+        .navbar-brand i { color: #fbbf24; }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-back:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .main-content { padding: 30px 0; }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            height: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .stat-card .icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .stat-card .icon.red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .stat-card .icon.blue { background: rgba(99, 102, 241, 0.15); color: var(--primary); }
+        .stat-card .icon.yellow { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .stat-card .icon.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent); }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .stat-card .sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .highlight-card {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+        }
+
+        .highlight-card::before { display: none; }
+        .highlight-card .icon { background: rgba(255, 255, 255, 0.2); color: white; }
+        .highlight-card .label { color: rgba(255, 255, 255, 0.8); }
+        .highlight-card .sub { color: rgba(255, 255, 255, 0.7); }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .summary-box h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-item:last-child { border-bottom: none; }
+
+        .summary-item .label {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-item .value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .summary-item .value.positive { color: var(--success); }
+        .summary-item .value.negative { color: var(--danger); }
+
+        .profit-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .profit-indicator.loss {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .profit-indicator i { font-size: 1.5rem; }
+        .profit-indicator.loss i { color: var(--danger); }
+
+        @media (max-width: 768px) {
+            .stat-card .value { font-size: 1.5rem; }
+            .page-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-landmark me-2"></i>OlympusPay
+            </a>
+            <a href="/dashboard" class="btn-back">
+                <i class="fas fa-arrow-left me-2"></i>Voltar
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-line me-2"></i>Minhas Estatísticas</h1>
+                <p>Acompanhe seu desempenho financeiro na OlympusPay</p>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon green"><i class="fas fa-arrow-down"></i></div>
+                        <div class="label">Total Depositado</div>
+                        <div class="value">R$ <%= stats.totalDeposited.toFixed(2) %></div>
+                        <div class="sub"><%= stats.depositsCount %> depósitos</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon red"><i class="fas fa-arrow-up"></i></div>
+                        <div class="label">Total Sacado</div>
+                        <div class="value">R$ <%= stats.totalWithdrawn.toFixed(2) %></div>
+                        <div class="sub"><%= stats.withdrawsCount %> saques</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon yellow"><i class="fas fa-percentage"></i></div>
+                        <div class="label">Taxas Pagas</div>
+                        <div class="value">R$ <%= stats.totalFees.toFixed(2) %></div>
+                        <div class="sub">Dep: R$ <%= stats.feesDeposit.toFixed(2) %> | Saq: R$ <%= stats.feesWithdraw.toFixed(2) %></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card highlight-card">
+                        <div class="icon"><i class="fas fa-wallet"></i></div>
+                        <div class="label">Saldo Atual</div>
+                        <div class="value">R$ <%= stats.currentBalance.toFixed(2) %></div>
+                        <div class="sub">Disponível para saque</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="stat-card">
+                        <div class="icon blue"><i class="fas fa-chart-pie"></i></div>
+                        <div class="label">Lucro Bruto</div>
+                        <div class="value">R$ <%= stats.grossProfit.toFixed(2) %></div>
+                        <div class="sub">Antes das taxas</div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="stat-card">
+                        <div class="icon purple"><i class="fas fa-calculator"></i></div>
+                        <div class="label">Lucro Líquido</div>
+                        <div class="value">R$ <%= stats.netProfit.toFixed(2) %></div>
+                        <div class="sub">Após taxas</div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="stat-card">
+                        <div class="icon green"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="label">Total Transações</div>
+                        <div class="value"><%= stats.depositsCount + stats.withdrawsCount %></div>
+                        <div class="sub">Depósitos + Saques</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-area text-primary"></i>Movimentação dos Últimos 30 Dias</h3>
+                        <canvas id="monthChart" height="250"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="summary-box">
+                        <h3><i class="fas fa-receipt me-2"></i>Resumo Financeiro</h3>
+                        
+                        <div class="summary-item">
+                            <span class="label"><i class="fas fa-arrow-down text-success"></i>Entradas</span>
+                            <span class="value positive">+ R$ <%= stats.totalDeposited.toFixed(2) %></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label"><i class="fas fa-arrow-up text-danger"></i>Saídas</span>
+                            <span class="value negative">- R$ <%= stats.totalWithdrawn.toFixed(2) %></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label"><i class="fas fa-percentage text-warning"></i>Taxas</span>
+                            <span class="value negative">- R$ <%= stats.totalFees.toFixed(2) %></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label"><i class="fas fa-equals text-primary"></i>Resultado</span>
+                            <span class="value <%= stats.netProfit >= 0 ? 'positive' : 'negative' %>">
+                                R$ <%= stats.netProfit.toFixed(2) %>
+                            </span>
+                        </div>
+
+                        <div class="profit-indicator <%= stats.netProfit < 0 ? 'loss' : '' %>">
+                            <i class="fas fa-<%= stats.netProfit >= 0 ? 'trending-up text-success' : 'trending-down text-danger' %>"></i>
+                            <div>
+                                <div class="small text-secondary">Status</div>
+                                <div class="fw-bold">
+                                    <%= stats.netProfit >= 0 ? 'Você está no lucro!' : 'Você está no prejuízo' %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const last30Days = <%- JSON.stringify(stats.last30Days) %>;
+        
+        new Chart(document.getElementById('monthChart'), {
+            type: 'line',
+            data: {
+                labels: last30Days.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Depósitos',
+                        data: last30Days.map(d => d.deposits),
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Saques',
+                        data: last30Days.map(d => d.withdraws),
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { color: '#94a3b8', usePointStyle: true } 
+                    }
+                },
+                scales: {
+                    x: { 
+                        ticks: { color: '#94a3b8', maxRotation: 45 }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    },
+                    y: { 
+                        ticks: { color: '#94a3b8' }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' } 
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | OlympusPay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2234;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 10% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .navbar {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--text-primary) !important;
+        }
+
+        .navbar-brand i { color: #fbbf24; }
+
+        .main-content { padding: 30px 0; }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card .icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .stat-card .icon.red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .stat-card .icon.blue { background: rgba(99, 102, 241, 0.15); color: var(--primary); }
+        .stat-card .icon.yellow { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .stat-card .icon.cyan { background: rgba(6, 182, 212, 0.15); color: var(--info); }
+        .stat-card .icon.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent); }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-card .sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-card .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-card .header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .table-dark-custom {
+            background: transparent;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .table-dark-custom th {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: var(--border-color);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 20px;
+        }
+
+        .table-dark-custom td {
+            border-color: var(--border-color);
+            padding: 14px 20px;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .table-dark-custom tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-completed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-failed { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .admin-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .admin-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .admin-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .admin-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .admin-item .avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .admin-item .name { font-weight: 500; }
+        .admin-item .email { font-size: 0.8rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .admin-item .actions-col {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger-custom {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-danger-custom:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .form-control-dark {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 10px;
+        }
+
+        .form-control-dark:focus {
+            background: var(--bg-dark);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .alert-custom {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .backup-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .backup-info i { font-size: 1.5rem; color: var(--success); }
+
+        .quick-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-link {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .stat-card .value { font-size: 1.3rem; }
+            .page-header h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-landmark me-2"></i>OlympusPay
+            </a>
+            <div class="quick-links">
+                <a href="/dashboard" class="quick-link"><i class="fas fa-home me-2"></i>Dashboard</a>
+                <a href="/admin" class="quick-link"><i class="fas fa-cog me-2"></i>Gerenciar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-chart-line me-2"></i>Dashboard Administrativo</h1>
+                <p>Visão geral completa da plataforma OlympusPay</p>
+            </div>
+
+            <% if (msg) { %>
+                <div class="alert alert-custom mb-4">
+                    <i class="fas fa-info-circle me-2"></i><%= msg %>
+                </div>
+            <% } %>
+
+            <div class="row g-4 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon green"><i class="fas fa-arrow-down"></i></div>
+                        <div class="label">Total Depositado</div>
+                        <div class="value">R$ <%= stats.totalDeposits.toFixed(2) %></div>
+                        <div class="sub"><%= stats.completedDepositsCount %> depósitos</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon red"><i class="fas fa-arrow-up"></i></div>
+                        <div class="label">Total Sacado</div>
+                        <div class="value">R$ <%= stats.totalWithdraws.toFixed(2) %></div>
+                        <div class="sub"><%= stats.completedWithdrawsCount %> saques</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon yellow"><i class="fas fa-clock"></i></div>
+                        <div class="label">Pendentes</div>
+                        <div class="value"><%= stats.pendingDepositsCount + stats.pendingWithdrawsCount %></div>
+                        <div class="sub">R$ <%= (stats.totalPendingDeposits + stats.totalPendingWithdraws).toFixed(2) %></div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon purple"><i class="fas fa-wallet"></i></div>
+                        <div class="label">Em Custódia</div>
+                        <div class="value">R$ <%= stats.totalCustody.toFixed(2) %></div>
+                        <div class="sub">Saldo dos usuários</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon blue"><i class="fas fa-users"></i></div>
+                        <div class="label">Total Usuários</div>
+                        <div class="value"><%= stats.totalUsers %></div>
+                        <div class="sub"><%= stats.activeUsers %> ativos</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon cyan"><i class="fas fa-user-shield"></i></div>
+                        <div class="label">Administradores</div>
+                        <div class="value"><%= stats.totalAdmins %></div>
+                        <div class="sub"><%= stats.bannedUsers %> banidos</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon green"><i class="fas fa-coins"></i></div>
+                        <div class="label">Receita (Taxas)</div>
+                        <div class="value">R$ <%= stats.feeRevenue.toFixed(2) %></div>
+                        <div class="sub">Total arrecadado</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="icon yellow"><i class="fas fa-calendar-day"></i></div>
+                        <div class="label">Hoje</div>
+                        <div class="value">R$ <%= stats.todayDeposits.toFixed(2) %></div>
+                        <div class="sub">R$ <%= stats.todayWithdraws.toFixed(2) %> sacado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-bar me-2"></i>Movimentação dos Últimos 7 Dias</h3>
+                        <canvas id="weekChart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie me-2"></i>Distribuição</h3>
+                        <canvas id="pieChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="table-card">
+                        <div class="header">
+                            <h3><i class="fas fa-history me-2"></i>Transações Recentes</h3>
+                            <a href="/admin" class="btn-action btn-primary-custom">Ver Todas</a>
+                        </div>
+                        <table class="table table-dark-custom">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% recentTxs.forEach(tx => { %>
+                                <tr>
+                                    <td><%= tx.userName %></td>
+                                    <td>
+                                        <% if (tx.type === 'deposit') { %>
+                                            <span class="text-success"><i class="fas fa-arrow-down me-1"></i>Depósito</span>
+                                        <% } else { %>
+                                            <span class="text-danger"><i class="fas fa-arrow-up me-1"></i>Saque</span>
+                                        <% } %>
+                                    </td>
+                                    <td>R$ <%= parseFloat(tx.val).toFixed(2) %></td>
+                                    <td>
+                                        <% if (tx.status === 'completed') { %>
+                                            <span class="badge-status badge-completed">Concluído</span>
+                                        <% } else if (tx.status === 'pending') { %>
+                                            <span class="badge-status badge-pending">Pendente</span>
+                                        <% } else { %>
+                                            <span class="badge-status badge-failed">Falhou</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(tx.date).toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'}) %></td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <% if (isSuperAdmin) { %>
+                    <div class="admin-section">
+                        <h3><i class="fas fa-user-plus"></i>Adicionar Admin</h3>
+                        <form action="/admin/add-admin" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <div class="mb-3">
+                                <input type="number" name="userId" class="form-control form-control-dark" placeholder="ID do Usuário" required>
+                            </div>
+                            <button type="submit" class="btn-action btn-primary-custom w-100">
+                                <i class="fas fa-plus me-2"></i>Adicionar
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3><i class="fas fa-users-cog"></i>Administradores</h3>
+                        <div class="admin-list">
+                            <% adminList.forEach(admin => { %>
+                            <div class="admin-item">
+                                <div class="info">
+                                    <div class="avatar"><%= admin.name.charAt(0).toUpperCase() %></div>
+                                    <div>
+                                        <div class="name"><%= admin.name %></div>
+                                        <div class="email"><%= admin.email %></div>
+                                    </div>
+                                </div>
+                                <div class="actions-col">
+                                    <% if (admin.id !== user.id && !admin.isSuperAdmin) { %>
+                                    <form action="/admin/remove-admin" method="POST" style="margin:0;">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="userId" value="<%= admin.id %>">
+                                        <button type="submit" class="btn-action btn-danger-custom" onclick="return confirm('Remover admin?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    <% } else if (admin.id === user.id) { %>
+                                    <span class="badge bg-warning text-dark">Você</span>
+                                    <% } else if (admin.isSuperAdmin) { %>
+                                    <span class="badge bg-danger">Super</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3><i class="fas fa-database"></i>Backup</h3>
+                        <p class="text-secondary small mb-3">Backups automáticos a cada 1 hora</p>
+                        <form action="/admin/force-backup" method="POST" class="mb-2">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn-action btn-primary-custom w-100">
+                                <i class="fas fa-plus me-2"></i>Criar Backup Agora
+                            </button>
+                        </form>
+                        <a href="/admin/download-backup" class="btn-action btn-success-custom w-100 d-block text-center text-decoration-none mb-3">
+                            <i class="fas fa-download me-2"></i>Baixar Último Backup
+                        </a>
+                        <% if (backupInfo.lastBackup) { %>
+                        <div class="backup-info">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <div class="small">Último backup:</div>
+                                <div class="fw-bold"><%= new Date(backupInfo.lastBackup).toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'}) %></div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } else { %>
+                    <div class="admin-section">
+                        <h3><i class="fas fa-info-circle"></i>Informação</h3>
+                        <p class="text-secondary">Apenas o Super Admin pode gerenciar administradores e backups.</p>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const last7Days = <%- JSON.stringify(stats.last7Days) %>;
+        
+        new Chart(document.getElementById('weekChart'), {
+            type: 'bar',
+            data: {
+                labels: last7Days.map(d => d.date),
+                datasets: [
+                    {
+                        label: 'Depósitos',
+                        data: last7Days.map(d => d.deposits),
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Saques',
+                        data: last7Days.map(d => d.withdraws),
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#94a3b8' } }
+                },
+                scales: {
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Depósitos', 'Saques', 'Pendentes'],
+                datasets: [{
+                    data: [<%= stats.totalDeposits %>, <%= stats.totalWithdraws %>, <%= stats.totalPendingDeposits + stats.totalPendingWithdraws %>],
+                    backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(245, 158, 11, 0.8)']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
