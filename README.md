@@ -47,8 +47,8 @@ Plataforma de pagamentos e carteira digital construída com Node.js e Express. P
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/olimpo-pay.git
-cd olimpo-pay
+git clone https://github.com/lucasribeiroxzz/gateway-src
+cd gateway-src
 
 # Instale as dependências
 npm install
